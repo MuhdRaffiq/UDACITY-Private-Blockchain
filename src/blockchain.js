@@ -191,10 +191,12 @@ class Blockchain {
                 bodyBlock.then((bData) => {
                     if (bData.address == address) {
                         stars.push(bData.star);
+                        resolve(stars);
+                    } else {
+                        reject(Error("Wallet address does not exist in the chain"));
                     }
                 });
             }
-            resolve(stars);
         });
     }
 
