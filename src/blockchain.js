@@ -120,7 +120,7 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-            if (currentTime-messageTime < 300 ) {
+            if (currentTime-messageTime > 300 ) {
                 //verify message with wallet address
                 let verifStatus = bitcoinMessage.verify(message, address, signature);
                 if (verifStatus) {
