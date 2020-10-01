@@ -64,20 +64,26 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
+            
+            try {
             // Check for Genesis Block
-            if (this.height === -1) {
+                if (this.height == -1) {
                 block.previousBlockHash = null;
-            }
-            else {
-                block.previousBlockHash = this.chain[this.height+1].hash;
-            }
-            // Create block data
-            block.hash = SHA256(JSON.stringify(block)).toString();
-            block.time = new Date().getTime().toString().slice(0,-3);
-            block.height = this.height + 1;
+                }
+                 else {
+                block.previousBlockHash = this.chain[this.height].hash;
+                };
+                // Create block data
+                block.time = new Date().getTime().toString().slice(0,-3);
+                block.height = this.height + 1;
+                block.hash = SHA256(JSON.stringify(block)).toString();
 
-            // Adding block to the chain
-            this.chain.push(block);
+                // Adding block to the chain
+                this.chain.push(block);
+                this.height +=1;
+            } catch (error) {
+                reject(Error("block cannot be push to chain"))
+            };
 
             resolve(block);
         });
@@ -120,12 +126,13 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+
             if (currentTime-messageTime > 300 ) {
                 //verify message with wallet address
                 let verifStatus = bitcoinMessage.verify(message, address, signature);
                 if (verifStatus) {
                     let newBlock = new BlockClass.Block({message, address, signature, star});
-                    this._addBlock(newBlock);
+                    await this._addBlock(newBlock);
                     resolve(newBlock);
                 } else {
                     reject(Error("verification failed!"));
@@ -185,18 +192,19 @@ class Blockchain {
         return new Promise((resolve, reject) => {
             //looping through the chain
             for (let i = 1; i <= this.height; i++) {
-                //defining block by the number in the array
-                let block = this.chain[i];
-                let bodyBlock = block.getBData();
-                bodyBlock.then((bData) => {
+                //defining block by the array location in the chain
+                let data = this.chain[i];
+                let bBlock = data.getBData();
+                bBlock.then((bData) => {
                     if (bData.address == address) {
                         stars.push(bData.star);
                         resolve(stars);
                     } else {
-                        reject(Error("Wallet address does not exist in the chain"));
+                        reject(Error("Wallet address does not exist in the chain"))
                     }
                 });
             }
+            
         });
     }
 
@@ -213,7 +221,7 @@ class Blockchain {
             // valicating each block
             for (let i = 0; i <= this.height; i++) {
                 let block = this.chain[i];
-                let validBlock = block.validate();
+                let validBlock = await block.validate();
                 if (validBlock = false) {
                     errorLog.push(validBlock);
                 }
@@ -228,4 +236,4 @@ class Blockchain {
 
 }
 
-module.exports.Blockchain = Blockchain;   
+module.exports.Blockchain = Blockchain;  
