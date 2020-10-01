@@ -70,7 +70,7 @@ class BlockchainController {
                         return res.status(500).send("An error happened!");
                     }
                 } catch (error) {
-                    return res.status(500).send(error);
+                    return res.status(500).send("An Error happened when await this.blockchain.submitStar()");
                 }
             } else {
                 return res.status(500).send("Check the Body Parameter!");
