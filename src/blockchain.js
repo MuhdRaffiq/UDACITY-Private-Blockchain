@@ -127,7 +127,7 @@ class Blockchain {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
 
-            if (currentTime-messageTime > 300 ) {
+            if (currentTime-messageTime < 300 ) {
                 //verify message with wallet address
                 let verifStatus = bitcoinMessage.verify(message, address, signature);
                 if (verifStatus) {
@@ -154,7 +154,7 @@ class Blockchain {
         let self = this;
         return new Promise((resolve, reject) => {
             //filtering the hash in the chain and see if it is the same
-            let block = this.chain.filter(p => p.hash === hash)[0];
+            let block = this.chain.find(p => p.hash === hash)[0];
             if (block) {
                 resolve(block)
             }else {
@@ -197,12 +197,12 @@ class Blockchain {
                 let bBlock = data.getBData();
                 bBlock.then((bData) => {
                     if (bData.address == address) {
-                        stars.push(bData.star);
-                        resolve(stars);
+                        stars.push(bData.address, bData.star);
                     } else {
                         reject(Error("Wallet address does not exist in the chain"))
                     }
                 });
+                resolve(stars);
             }
             
         });
@@ -223,17 +223,17 @@ class Blockchain {
                 let block = this.chain[i];
                 let validBlock = await block.validate();
                 if (validBlock = false) {
-                    errorLog.push(validBlock);
+                    errorLog.push(`Block ${i} not valid`);
                 }
-                if (this.chain.length = 1) {
+                if (i > 0) {
                     if (this.chain[i-1].hash !== block.previousBlockHash ) {
                         errorLog.push(`${previousBlockHash} is not the previous block!`)
                     }
-                } 
+                }
             }resolve(errorLog);     
         });
     }
 
 }
 
-module.exports.Blockchain = Blockchain;  
+module.exports.Blockchain = Blockchain; 
