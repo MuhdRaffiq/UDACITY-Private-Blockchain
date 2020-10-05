@@ -222,12 +222,12 @@ class Blockchain {
             for (let i = 0; i <= this.height; i++) {
                 let block = this.chain[i];
                 let validBlock = await block.validate();
-                if (validBlock = false) {
+                if (validBlock == false) {
                     errorLog.push(`Block ${i} not valid`);
                 }
                 if (i > 0) {
                     if (this.chain[i-1].hash !== block.previousBlockHash ) {
-                        errorLog.push(`${previousBlockHash} is not the previous block!`)
+                        errorLog.push(`Block ${i-1} is not the previous block!`)
                     }
                 }
             }resolve(errorLog);     
@@ -236,4 +236,4 @@ class Blockchain {
 
 }
 
-module.exports.Blockchain = Blockchain; 
+module.exports.Blockchain = Blockchain;   
