@@ -51,7 +51,7 @@ class Block {
             }
             // Returning the Block false if not valid
             else {
-                reject(false)
+                resolve(false)
             }
 
         });
